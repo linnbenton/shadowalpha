@@ -134,6 +134,83 @@ export default function Home() {
           </div>
         </section>
       </div>
+      {/* TERMINAL PREVIEW */}
+      <section className="mt-32">
+        <div className="text-4xl font-bold">Shadow Terminal</div>
+
+        <p className="text-zinc-500 mt-4 max-w-2xl">
+          AI-powered market intelligence and autonomous execution environment.
+        </p>
+
+        <div className="mt-10 border border-zinc-800 rounded-3xl overflow-hidden bg-zinc-950">
+          {/* TOP BAR */}
+          <div className="border-b border-zinc-800 px-6 py-4 flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+          </div>
+
+          <div className="grid lg:grid-cols-3">
+            {/* LEFT PANEL */}
+            <div className="border-r border-zinc-800 p-6 space-y-4">
+              <div className="text-sm text-zinc-500">LIVE SIGNALS</div>
+
+              {[
+                "AI Infrastructure Momentum ↑",
+                "Smart Wallet Accumulation Detected",
+                "DePIN Sector Strength Increasing",
+                "Whale Rotation Into Solana AI",
+              ].map((signal) => (
+                <div
+                  key={signal}
+                  className="border border-zinc-800 rounded-2xl p-4 text-sm"
+                >
+                  {signal}
+                </div>
+              ))}
+            </div>
+
+            {/* CENTER PANEL */}
+            <div className="border-r border-zinc-800 p-6">
+              <div className="text-sm text-zinc-500 mb-4">
+                AI MARKET ANALYSIS
+              </div>
+
+              <div className="bg-black border border-zinc-800 rounded-2xl p-5 text-sm leading-relaxed text-zinc-300">
+                Current onchain activity suggests continued expansion in
+                AI-related ecosystems, with increasing smart capital allocation
+                into infrastructure and compute networks.
+                {"\n\n"}
+                Narrative acceleration detected across: - AI Infrastructure -
+                Autonomous Agents - DePIN Compute - Onchain Data Markets
+              </div>
+            </div>
+
+            {/* RIGHT PANEL */}
+            <div className="p-6">
+              <div className="text-sm text-zinc-500 mb-4">MARKET STATUS</div>
+
+              <div className="space-y-5">
+                {[
+                  ["Market Sentiment", "Bullish"],
+                  ["AI Sector Score", "92/100"],
+                  ["Risk Level", "Moderate"],
+                  ["Execution Status", "Active"],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="border border-zinc-800 rounded-2xl p-4"
+                  >
+                    <div className="text-zinc-500 text-sm">{label}</div>
+
+                    <div className="text-xl mt-2 font-semibold">{value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
