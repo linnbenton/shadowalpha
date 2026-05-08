@@ -18,33 +18,36 @@ export default function Home() {
         </div>
 
         <h1 className="mt-8 text-6xl md:text-7xl font-bold leading-tight">
-          Autonomous Onchain Execution Infrastructure
+          Autonomous Execution Infrastructure for Onchain Markets
         </h1>
 
         <p className="mt-6 max-w-2xl mx-auto text-xl text-[#7A7A7A]">
-          A single-operator system that unifies market intelligence, decision
-          logic, and execution into one autonomous trading stack.
+          AI agents that unify market intelligence, decision-making, and
+          execution into a single trading system for single-operator funds.
         </p>
       </section>
 
       {/* METRICS BAR (Product Hunt credibility layer) */}
       <section className="border-y border-[#1A1A1A]">
-        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 text-center text-sm text-[#7A7A7A]">
+        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 text-center text-sm text-[#7A7A7A]">
           <div>
             <div className="text-white font-bold">&lt;50ms</div>
-            High-frequency ready
+            Execution latency
           </div>
+
           <div>
             <div className="text-white font-bold">AI Agents</div>
-            Signal consensus engine
+            Multi-agent inference system
           </div>
+
           <div>
             <div className="text-white font-bold">24/7</div>
-            Continuous execution layer
+            Continuous market coverage
           </div>
+
           <div>
             <div className="text-white font-bold">Onchain</div>
-            Fully decentralized routing
+            Onchain execution layer
           </div>
         </div>
       </section>
@@ -122,7 +125,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold tracking-tight">
-                QUANT EXECUTION INFRASTRUCTURE
+                EXECUTION CONTROL LAYER
               </h2>
               <p className="text-[#7A7A7A] text-sm mt-2">
                 Autonomous trading system operating in real-time market
@@ -405,8 +408,8 @@ export default function Home() {
               >
                 <div className="text-xl font-semibold">{t}</div>
                 <p className="text-[#7A7A7A] mt-4">
-                  Institutional-grade execution infrastructure for
-                  high-frequency decision environments.
+                  Built for hedge funds, prop trading desks, and onchain quant
+                  operators deploying systematic strategies
                 </p>
               </div>
             ),
@@ -417,11 +420,13 @@ export default function Home() {
       {/* FINAL CTA (PRODUCT HUNT + VC CLOSE) */}
       <section className="border-t border-[#1A1A1A]">
         <div className="max-w-7xl mx-auto px-6 py-28 text-center">
-          <h2 className="text-4xl font-bold">Request Access</h2>
+          <h2 className="text-4xl font-bold">
+            Request Early Access to Execution Layer
+          </h2>
 
           <p className="text-[#7A7A7A] mt-4 max-w-2xl mx-auto">
-            Access is currently limited to selected operators and institutional
-            testers validating autonomous execution systems.
+            Access is limited to selected operators validating autonomous
+            trading infrastructure systems.
           </p>
 
           <button className="mt-10 rounded-2xl bg-[#FF6B00] px-8 py-4 font-medium shadow-[0_0_40px_rgba(255,107,0,0.25)]">
