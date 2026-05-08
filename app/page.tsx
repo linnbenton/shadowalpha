@@ -1,56 +1,138 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-20">
-      <div className="max-w-5xl mx-auto">
-        <div className="inline-block px-4 py-1 rounded-full border border-zinc-700 text-sm mb-6">
-          AI-Powered Onchain Intelligence
-        </div>
-
-        <h1 className="text-6xl font-bold leading-tight max-w-4xl">
-          ShadowAlpha
-        </h1>
-
-        <p className="text-zinc-400 text-xl mt-6 max-w-2xl">
-          Autonomous AI trading terminal powered by onchain analytics, narrative
-          intelligence, and smart execution infrastructure.
-        </p>
-
-        <div className="flex gap-4 mt-10">
-          <button className="bg-white text-black px-6 py-3 rounded-xl font-medium">
-            Launch App
-          </button>
-
-          <button className="border border-zinc-700 px-6 py-3 rounded-xl">
-            View GitHub
-          </button>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6 mt-24">
-          <div className="border border-zinc-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold">AI Narrative Scanner</h3>
-
-            <p className="text-zinc-400 mt-3">
-              Detect emerging market narratives and smart money flows in
-              realtime.
-            </p>
+    <main className="min-h-screen bg-black text-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        {/* HERO */}
+        <section>
+          <div className="inline-block border border-zinc-800 rounded-full px-4 py-1 text-sm text-zinc-400">
+            AI-Powered Onchain Intelligence
           </div>
 
-          <div className="border border-zinc-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold">Smart Execution</h3>
+          <h1 className="text-7xl font-bold mt-8 leading-tight max-w-5xl">
+            ShadowAlpha
+          </h1>
 
-            <p className="text-zinc-400 mt-3">
-              Execute trades through optimized onchain routing and automation.
-            </p>
+          <p className="text-zinc-400 text-xl mt-6 max-w-2xl leading-relaxed">
+            Autonomous AI trading terminal powered by narrative intelligence,
+            smart money analytics, and automated execution infrastructure.
+          </p>
+
+          <div className="flex gap-4 mt-10">
+            <button className="bg-white text-black px-6 py-3 rounded-2xl font-medium hover:opacity-90 transition">
+              Launch Terminal
+            </button>
+
+            <button className="border border-zinc-700 px-6 py-3 rounded-2xl hover:bg-zinc-900 transition">
+              GitHub
+            </button>
+          </div>
+        </section>
+
+        {/* GRID */}
+        <section className="grid lg:grid-cols-3 gap-6 mt-24">
+          {/* AI COPILOT */}
+          <div className="border border-zinc-800 rounded-3xl p-6 bg-zinc-950">
+            <div className="text-sm text-zinc-500 mb-4">AI Copilot</div>
+
+            <div className="bg-black border border-zinc-800 rounded-2xl p-4 text-sm">
+              <div className="text-zinc-500">
+                &gt; Analyze current AI market momentum
+              </div>
+
+              <div className="mt-4 text-zinc-300 leading-relaxed">
+                AI infrastructure assets are showing accelerated capital inflows
+                across Solana and Base ecosystems.
+              </div>
+            </div>
           </div>
 
-          <div className="border border-zinc-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold">Autonomous Agents</h3>
+          {/* SMART MONEY */}
+          <div className="border border-zinc-800 rounded-3xl p-6 bg-zinc-950">
+            <div className="text-sm text-zinc-500 mb-4">
+              Smart Money Activity
+            </div>
 
-            <p className="text-zinc-400 mt-3">
-              Deploy AI agents that monitor markets and act automatically.
-            </p>
+            <div className="space-y-4 text-sm">
+              <div className="border border-zinc-800 rounded-2xl p-4">
+                <div className="text-white">
+                  Wallet 0x8a2f accumulated AI assets
+                </div>
+
+                <div className="text-zinc-500 mt-2">3 minutes ago</div>
+              </div>
+
+              <div className="border border-zinc-800 rounded-2xl p-4">
+                <div className="text-white">
+                  Whale exposure to DePIN increased by 18%
+                </div>
+
+                <div className="text-zinc-500 mt-2">12 minutes ago</div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          {/* SIGNALS */}
+          <div className="border border-zinc-800 rounded-3xl p-6 bg-zinc-950">
+            <div className="text-sm text-zinc-500 mb-4">Opportunity Scores</div>
+
+            <div className="space-y-5">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>AI Infra</span>
+                  <span>92/100</span>
+                </div>
+
+                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-white w-[92%]" />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>DePIN</span>
+                  <span>88/100</span>
+                </div>
+
+                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-white w-[88%]" />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>RWA</span>
+                  <span>71/100</span>
+                </div>
+
+                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-white w-[71%]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ARCHITECTURE */}
+        <section className="mt-28">
+          <div className="text-4xl font-bold">Architecture</div>
+
+          <div className="grid md:grid-cols-5 gap-4 mt-12">
+            {[
+              "AI Agents",
+              "Market Intelligence",
+              "Signal Engine",
+              "SoDEX Execution",
+              "Wallet Automation",
+            ].map((item) => (
+              <div
+                key={item}
+                className="border border-zinc-800 rounded-3xl p-6 text-center bg-zinc-950"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );
