@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ShadowAlpha
 
-## Getting Started
+AI-powered onchain research and autonomous trading terminal.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+ShadowAlpha combines AI agents, onchain analytics, smart money tracking, and automated execution into a unified trading workflow.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- AI Narrative Scanner
+- Smart Money Tracking
+- Autonomous Trading Agents
+- Onchain Analytics
+- SoDEX Execution
+- Risk Monitoring
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Roadmap
 
-## Learn More
+### Wave 1
 
-To learn more about Next.js, take a look at the following resources:
+- Landing page
+- AI workflow architecture
+- Market intelligence layer
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Wave 2
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Live AI agents
+- Wallet analytics
+- Autonomous execution
 
-## Deploy on Vercel
+### Wave 3
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Multi-chain support
+- Community signals
+- Portfolio automation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## SoSoValue Integration
+
+ShadowAlpha uses SoSoValue APIs for:
+
+- narrative detection
+- sector analytics
+- market intelligence
+- capital flow monitoring
+
+## SoDEX Integration
+
+ShadowAlpha uses SoDEX infrastructure for:
+
+- optimized trade execution
+- liquidity routing
+- automated swaps
+- execution workflows
