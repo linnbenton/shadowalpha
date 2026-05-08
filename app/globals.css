@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  border-color: #1a1a1a;
+}
+
+::selection {
+  background: #ff6b00;
+  color: white;
+}
+
+/* =========================
+   MARKET DRIFT ANIMATIONS
+   ========================= */
+
+@keyframes driftSlow {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-20%);
+  }
+}
+
+@keyframes driftMedium {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-30%);
+  }
+}
+
+@keyframes driftFast {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-40%);
+  }
+}
+
+/* LAYERS */
+
+.market-drift-slow {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  animation: driftSlow 60s linear infinite;
+  will-change: transform;
+}
+
+.market-drift-medium {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  animation: driftMedium 40s linear infinite;
+  will-change: transform;
+}
+
+.market-drift-fast {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  animation: driftFast 25s linear infinite;
+  will-change: transform;
+}
+
+@keyframes driftSlow {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-30%, 0, 0);
+  }
+}
+
+@keyframes driftMedium {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-45%, 0, 0);
+  }
+}
+
+@keyframes driftFast {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-60%, 0, 0);
+  }
+}
+
+.layer {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  will-change: transform;
+}
+
+/* SPEED LAYERS */
+.market-drift-slow {
+  animation: driftSlow 60s linear infinite;
+}
+
+.market-drift-medium {
+  animation: driftMedium 40s linear infinite;
+}
+
+.market-drift-fast {
+  animation: driftFast 25s linear infinite;
+}
+
+.layer svg {
+  opacity: 1;
 }
