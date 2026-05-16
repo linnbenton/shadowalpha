@@ -392,12 +392,12 @@ export default function Home() {
               <Link
                 href="/terminal"
                 className="
-            rounded-2xl
-            bg-[#FF6B00]
-            px-6 py-3
-            font-medium
-            shadow-[0_0_30px_rgba(255,107,0,0.25)]
-          "
+                  rounded-2xl
+                  bg-[#FF6B00]
+                  px-6 py-3
+                  font-medium
+                  shadow-[0_0_30px_rgba(255,107,0,0.25)]
+                "
               >
                 Try Terminal
               </Link>
@@ -415,31 +415,51 @@ export default function Home() {
                     }
 
                     select(PhantomWalletName);
-
-                    setTimeout(async () => {
-                      try {
-                        await connect();
-                      } catch (e) {
-                        console.log(e);
-                      }
-                    }, 500);
                   } catch (err) {
                     console.log(err);
                   }
                 }}
                 className="
+                  relative
+                  overflow-hidden
+
                   rounded-2xl
-                  border border-[#1A1A1A]
-                  bg-[#0D0D0D]
+                  border border-orange-400/20
+
+                  bg-[#FF6B00]
+
                   px-6 py-3
                   text-sm
+                  font-medium
+                  text-white
+
+                  transition-all
+                  duration-300
+
+                  hover:scale-105
+                  hover:bg-[#ff7b1a]
+
+                  shadow-[0_0_30px_rgba(255,107,0,0.35)]
                 "
               >
-                {connected
-                  ? `${publicKey?.toBase58().slice(0, 4)}...${publicKey
-                      ?.toBase58()
-                      .slice(-4)}`
-                  : "Connect Wallet"}
+                <span className="relative z-10">
+                  {connected ? "Disconnect Wallet" : "Connect Wallet"}
+                </span>
+
+                <div
+                  className="
+                    absolute
+                    inset-0
+
+                    bg-gradient-to-r
+                    from-transparent
+                    via-white/20
+                    to-transparent
+
+                    -translate-x-full
+                    animate-[shine_2.5s_linear_infinite]
+                  "
+                />
               </button>
             </div>
           </div>

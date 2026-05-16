@@ -126,3 +126,9 @@ body {
 .layer svg {
   opacity: 1;
 }
+
+@keyframes shine {
+  100% {
+    transform: translateX(200%);
+  }
+}
