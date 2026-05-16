@@ -1,7 +1,133 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
+
+import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
+
+import { Connection, SystemProgram, Transaction } from "@solana/web3.js";
+
+type Coin = {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+};
+
+type Signal = {
+  signal: string;
+  confidence: number;
+  trend: string;
+  asset: string;
+  change: number;
+};
+
+type Risk = {
+  level: string;
+  color: string;
+  score: number;
+};
+
+type Execution = {
+  hash: string;
+  asset: string;
+  side: string;
+  status: string;
+};
 
 export default function Home() {
+  const [coins, setCoins] = useState<Coin[]>([]);
+  const [signal, setSignal] = useState<Signal | null>(null);
+  const [risk, setRisk] = useState<Risk | null>(null);
+  const [execution, setExecution] = useState<Execution | null>(null);
+  const [executing, setExecuting] = useState(false);
+  const [txHash, setTxHash] = useState("");
+  const { connected, publicKey, connect, disconnect, select, sendTransaction } =
+    useWallet();
+
+  async function fetchMarket() {
+    try {
+      const res = await fetch("/api/market", {
+        cache: "no-store",
+      });
+
+      const json = await res.json();
+
+      console.log(json);
+
+      if (json?.success && Array.isArray(json.data)) {
+        setCoins(json.data.slice(0, 3));
+        setSignal(json.signal);
+        setRisk(json.risk);
+      }
+    } catch (err) {
+      console.log("market fetch retry...");
+    }
+  }
+
+  async function executeTrade() {
+    try {
+      if (!publicKey) {
+        alert("Connect wallet first");
+        return;
+      }
+
+      setExecuting(true);
+
+      const connection = new Connection(
+        "https://api.devnet.solana.com",
+        "confirmed",
+      );
+
+      const transaction = new Transaction();
+
+      transaction.add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: publicKey,
+          lamports: 1000,
+        }),
+      );
+
+      transaction.feePayer = publicKey;
+
+      const latestBlockhash = await connection.getLatestBlockhash();
+
+      transaction.recentBlockhash = latestBlockhash.blockhash;
+
+      const signature = await sendTransaction(transaction, connection);
+
+      await connection.confirmTransaction({
+        signature,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+      });
+
+      setTxHash(signature);
+
+      console.log("DEVNET TX:", signature);
+    } catch (err) {
+      console.error(err);
+      alert("Transaction failed");
+    } finally {
+      setExecuting(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchMarket();
+
+    const interval = setInterval(() => {
+      fetchMarket();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className="min-h-screen text-white bg-black relative overflow-hidden">
       {/* ORANGE CORE GLOW */}
@@ -279,6 +405,42 @@ export default function Home() {
               <button className="rounded-2xl border border-[#1A1A1A] bg-[#0D0D0D] px-6 py-3">
                 View Demo
               </button>
+
+              <button
+                onClick={async () => {
+                  try {
+                    if (connected) {
+                      await disconnect();
+                      return;
+                    }
+
+                    select(PhantomWalletName);
+
+                    setTimeout(async () => {
+                      try {
+                        await connect();
+                      } catch (e) {
+                        console.log(e);
+                      }
+                    }, 500);
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }}
+                className="
+                  rounded-2xl
+                  border border-[#1A1A1A]
+                  bg-[#0D0D0D]
+                  px-6 py-3
+                  text-sm
+                "
+              >
+                {connected
+                  ? `${publicKey?.toBase58().slice(0, 4)}...${publicKey
+                      ?.toBase58()
+                      .slice(-4)}`
+                  : "Connect Wallet"}
+              </button>
             </div>
           </div>
         </div>
@@ -309,21 +471,43 @@ export default function Home() {
             <div className="md:col-span-8 border border-[#1A1A1A] bg-[#0D0D0D] rounded-3xl p-6">
               <div className="text-sm text-[#7A7A7A]">MARKET OVERVIEW</div>
 
-              <div className="mt-6 grid grid-cols-3 gap-4 text-xs">
-                <div className="p-4 border border-[#1A1A1A] rounded-2xl">
-                  BTC / USDT
-                  <div className="text-green-400 mt-2">+2.41%</div>
-                </div>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                {coins.map((coin) => (
+                  <div
+                    key={coin.id}
+                    className="p-4 border border-[#1A1A1A] rounded-2xl"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold uppercase">
+                          {coin.symbol} / USD
+                        </div>
 
-                <div className="p-4 border border-[#1A1A1A] rounded-2xl">
-                  ETH / USDT
-                  <div className="text-red-400 mt-2">-0.87%</div>
-                </div>
+                        <div className="text-[#7A7A7A] mt-1">{coin.name}</div>
+                      </div>
 
-                <div className="p-4 border border-[#1A1A1A] rounded-2xl">
-                  SOL / USDT
-                  <div className="text-green-400 mt-2">+5.12%</div>
-                </div>
+                      <img
+                        src={coin.image}
+                        alt={coin.name}
+                        className="w-8 h-8 rounded-full"
+                      />
+                    </div>
+
+                    <div className="mt-4 text-lg font-bold">
+                      ${coin.current_price.toLocaleString()}
+                    </div>
+
+                    <div
+                      className={`mt-2 ${
+                        coin.price_change_percentage_24h >= 0
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {coin.price_change_percentage_24h.toFixed(2)}%
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* chart placeholder */}
@@ -337,19 +521,27 @@ export default function Home() {
               <div className="text-sm text-[#7A7A7A]">AI SIGNAL ENGINE</div>
 
               <div className="mt-6 space-y-4 text-xs">
-                <div className="p-4 border border-green-500/20 rounded-2xl">
-                  🟢 LONG SIGNAL DETECTED
-                  <div className="text-[#7A7A7A] mt-2">
-                    Smart money accumulation detected on SOL
+                {signal && (
+                  <div className="p-4 border border-green-500/20 rounded-2xl">
+                    🟢 {signal.signal}
+                    <div className="text-[#7A7A7A] mt-2">{signal.trend}</div>
+                    <div className="text-cyan-400 mt-2">
+                      confidence: {signal.confidence}%
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="p-4 border border-yellow-500/20 rounded-2xl">
-                  🟡 RISK ADJUSTMENT
-                  <div className="text-[#7A7A7A] mt-2">
-                    Volatility spike in BTC dominance
+                {risk && (
+                  <div className="p-4 border border-yellow-500/20 rounded-2xl">
+                    ⚠ {risk.level}
+                    <div className="text-[#7A7A7A] mt-2">
+                      volatility exposure analysis
+                    </div>
+                    <div className="text-yellow-400 mt-2">
+                      risk score: {risk.score}/100
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="p-4 border border-cyan-500/20 rounded-2xl">
                   🤖 AI CONFIDENCE: 87%
@@ -375,14 +567,102 @@ export default function Home() {
 
               <div className="border border-[#1A1A1A] bg-[#0D0D0D] rounded-3xl p-6">
                 <div className="text-sm text-[#7A7A7A]">EXECUTION STATUS</div>
-                <div className="text-green-400 text-2xl font-bold mt-4">
-                  LIVE
+
+                <div
+                  className={`
+      text-2xl
+      font-bold
+      mt-4
+      ${executing ? "text-yellow-400" : "text-green-400"}
+    `}
+                >
+                  {executing ? "EXECUTING" : "LIVE"}
                 </div>
+
                 <div className="text-[#7A7A7A] text-xs mt-2">
-                  AUTONOMOUS MODE ACTIVE
+                  {executing
+                    ? "Submitting transaction to Solana Devnet..."
+                    : txHash
+                      ? "Latest transaction confirmed onchain"
+                      : "Autonomous execution engine ready"}
                 </div>
+
+                {txHash && (
+                  <a
+                    href={`https://explorer.solana.com/tx/${txHash}?cluster=devnet`}
+                    target="_blank"
+                    className="text-cyan-400 text-xs mt-4 block"
+                  >
+                    View Latest Transaction →
+                  </a>
+                )}
               </div>
             </div>
+          </div>
+
+          {/* EXECUTION TERMINAL */}
+          <div className="md:col-span-12 border border-[#1A1A1A] bg-[#0D0D0D] rounded-3xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm text-[#7A7A7A]">
+                  AUTONOMOUS EXECUTION ENGINE
+                </div>
+
+                <div className="text-xs text-[#555] mt-2">
+                  simulated devnet execution layer
+                </div>
+              </div>
+
+              <button
+                onClick={executeTrade}
+                disabled={!connected || executing}
+                className="
+                  rounded-2xl
+                  bg-[#FF6B00]
+                  px-5 py-3
+                  text-sm
+                  disabled:opacity-40
+                "
+              >
+                {executing
+                  ? "Executing..."
+                  : connected
+                    ? "Execute Trade"
+                    : "Connect Wallet"}
+              </button>
+
+              {txHash && (
+                <a
+                  href={`https://explorer.solana.com/tx/${txHash}?cluster=devnet`}
+                  target="_blank"
+                  className="text-cyan-400 text-xs mt-3 block"
+                >
+                  View Devnet Transaction →
+                </a>
+              )}
+            </div>
+
+            {execution && (
+              <div className="mt-6 border border-green-500/20 rounded-2xl p-4 text-xs">
+                <div className="text-green-400">● {execution.status}</div>
+
+                <div className="mt-2 text-[#7A7A7A]">
+                  asset: {execution.asset}
+                </div>
+
+                <div className="text-[#7A7A7A]">side: {execution.side}</div>
+
+                <div className="text-cyan-400 mt-3 break-all">
+                  <a
+                    href={`https://explorer.solana.com/tx/${execution.hash}?cluster=devnet`}
+                    target="_blank"
+                    className="text-cyan-400 underline break-all"
+                  >
+                    {execution.hash}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* FOOT NOTE */}
