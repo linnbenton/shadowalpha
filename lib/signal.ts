@@ -1,50 +1,53 @@
-type Coin = {
-  id: string;
-  symbol: string;
-  name: string;
-  current_price: number;
-  price_change_percentage_24h: number;
+export type Signal = {
+  signal: "LONG" | "SHORT" | "NEUTRAL";
+  trend: string;
+  confidence: number;
+  score: number;
 };
 
-export function generateSignal(coins: Coin[]) {
-  if (!coins.length) {
+export function generateSignal(data: any[]): Signal {
+  let score = 0;
+
+  if (!data || data.length === 0) {
     return {
-      signal: "NO SIGNAL",
+      signal: "NEUTRAL",
+      trend: "no market data",
       confidence: 0,
-      trend: "neutral",
+      score: 0,
     };
   }
 
-  // cari coin performa terbaik
-  const strongest = [...coins].sort(
-    (a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h,
-  )[0];
+  const btc = data.find((c) => c.symbol?.toLowerCase() === "btc");
 
-  const change = strongest.price_change_percentage_24h;
+  const change = btc?.price_change_percentage_24h ?? 0;
+  const volume = btc?.total_volume ?? 0;
 
-  let trend = "neutral";
-  let signal = "HOLD";
-  let confidence = 50;
+  // 🧠 Momentum logic
+  if (change > 2) score += 40;
+  if (change > 5) score += 25;
+  if (change < -2) score -= 40;
+  if (change < -5) score -= 25;
 
-  if (change > 4) {
-    trend = "bullish momentum";
-    signal = `LONG ${strongest.symbol.toUpperCase()}`;
-    confidence = 78;
-  } else if (change > 1) {
-    trend = "bullish";
-    signal = `WATCH ${strongest.symbol.toUpperCase()}`;
-    confidence = 64;
-  } else if (change < -4) {
-    trend = "bearish momentum";
-    signal = `AVOID ${strongest.symbol.toUpperCase()}`;
-    confidence = 74;
-  }
+  // 📊 volume confirmation
+  if (volume > 50_000_000) score += 20;
+
+  // 🧠 final decision
+  let signal: "LONG" | "SHORT" | "NEUTRAL" = "NEUTRAL";
+
+  if (score >= 50) signal = "LONG";
+  else if (score <= -50) signal = "SHORT";
+
+  const confidence = Math.min(100, Math.abs(score));
 
   return {
     signal,
+    trend:
+      signal === "LONG"
+        ? "bullish momentum + volume expansion"
+        : signal === "SHORT"
+          ? "bearish pressure + distribution"
+          : "sideways / no edge",
     confidence,
-    trend,
-    asset: strongest.name,
-    change,
+    score,
   };
 }
