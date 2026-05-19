@@ -1,5 +1,7 @@
 # ShadowAlpha
 
+### by Airdrops BMW
+
 AI-powered autonomous trading infrastructure for onchain markets.
 
 ## Overview
@@ -9,7 +11,7 @@ ShadowAlpha is a modular AI trading system designed for crypto-native operators,
 - live market intelligence
 - AI-generated trade signals
 - risk evaluation
-- autonomous execution
+- autonomous execution framework
 - Solana devnet transaction infrastructure
 
 The system is structured into 3 core layers:
@@ -31,6 +33,17 @@ The system is structured into 3 core layers:
 
 ShadowAlpha has successfully evolved beyond static simulation into an interactive execution prototype.
 
+Wave 1 focused on validating the execution interface, AI signal flow, and live market interaction layer.
+
+Current implementation focuses on:
+
+- live market interaction
+- explainable AI signal generation
+- execution workflow simulation
+- Solana devnet infrastructure validation
+
+Advanced autonomous execution is currently under active development for Wave 2.
+
 ### Implemented Features
 
 - Live market API integration
@@ -38,13 +51,97 @@ ShadowAlpha has successfully evolved beyond static simulation into an interactiv
 - Dynamic risk engine
 - Solana wallet connection
 - Real devnet transaction execution
-- Autonomous execution architecture
+- Autonomous execution routing framework
 - Institutional trading dashboard UI
 - Real-time signal refresh loop
 
 ---
 
-# Core Features
+# Architecture
+
+## Smart Money Intelligence Flow
+
+The system continuously evaluates real-time market conditions and converts them into explainable execution signals.
+
+This architecture is designed to simulate institutional-grade autonomous trading workflows for onchain environments.
+
+```text
+        ┌────────────────────┐
+        │ Binance WebSocket  │
+        │ Live Market Feed   │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ Market Context AI  │
+        │ - Price Action     │
+        │ - Funding Rate     │
+        │ - Volume Spike     │
+        │ - Sentiment Score  │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ Signal Engine      │
+        │ LONG / SHORT Bias  │
+        │ Confidence Score   │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ Risk Engine        │
+        │ Exposure Control   │
+        │ Volatility Filter  │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ Autonomous Router  │
+        │ SoDEX Execution    │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ Live Agent Feed    │
+        │ Explainable AI Log │
+        └────────────────────┘
+```
+
+## Explainable AI Decision Layer
+
+ShadowAlpha does not generate black-box signals.
+
+Every trade decision is derived from a combination of:
+
+- market sentiment
+- funding rate structure
+- volatility expansion
+- volume spike detection
+- momentum confirmation
+
+Example logic:
+
+```ts
+if (sentiment > 70 && funding > 0 && volumeSpike) {
+  signal = "LONG";
+}
+```
+
+The AI agent then generates a confidence score and publishes the reasoning directly into the live execution feed.
+
+## Explainable AI Engine
+
+ShadowAlpha exposes the reasoning behind every generated signal.
+
+Instead of black-box outputs, the system provides:
+
+- confidence scoring
+- market reasoning
+- volatility interpretation
+- execution context
+- live decision logs
+
+This allows traders to understand why the AI generated a specific market bias.
 
 ## Live Market Intelligence
 
@@ -108,6 +205,31 @@ This transforms the project from UI simulation into executable infrastructure.
 
 ---
 
+# Live Terminal
+
+The terminal acts as the operational layer between AI decision-making and execution visibility.
+
+ShadowAlpha includes a real-time institutional-style execution terminal featuring:
+
+- live candlestick visualization
+- AI signal monitoring
+- explainable market reasoning
+- dynamic risk status
+- autonomous execution routing visualization
+- live agent activity feed
+
+The interface is designed to simulate institutional trading infrastructure for autonomous onchain execution systems.
+
+---
+
+# Current Prototype Limitations
+
+Current Wave 1 implementation is focused on infrastructure validation and execution workflow simulation.
+
+The system is not intended for production trading or autonomous capital deployment at this stage.
+
+---
+
 # Roadmap
 
 ## Wave 2
@@ -143,6 +265,22 @@ Focus: production-grade autonomous trading infrastructure.
 
 ---
 
+# Live Data Sources
+
+Current prototype integrates:
+
+- Binance WebSocket streams
+- CoinGecko market APIs
+- Solana devnet infrastructure
+
+Planned integrations:
+
+- SoSoValue intelligence APIs
+- smart money tracking feeds
+- wallet intelligence systems
+
+---
+
 # Tech Stack
 
 - Next.js
@@ -151,7 +289,17 @@ Focus: production-grade autonomous trading infrastructure.
 - Solana Web3.js
 - Solana Wallet Adapter
 - CoinGecko API
-- Planned SoSoValue integration
+- SoSoValue API (planned integration)
+- Binance WebSocket Streams
+- Lightweight Charts
+
+---
+
+# Execution Philosophy
+
+ShadowAlpha is designed around the idea that market intelligence, risk analysis, and execution should operate as a unified autonomous system.
+
+Instead of relying on disconnected dashboards and manual decision-making, the platform aims to create an AI-assisted execution environment capable of continuously monitoring market structure and reacting in real time.
 
 ---
 
