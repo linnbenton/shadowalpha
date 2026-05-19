@@ -82,9 +82,25 @@ export default function TerminalPage() {
         },
       },
 
+      rightPriceScale: {
+        borderColor: "rgba(255,255,255,0.08)",
+      },
+
+      timeScale: {
+        borderColor: "rgba(255,255,255,0.08)",
+        timeVisible: true,
+      },
+
+      crosshair: {
+        mode: 0,
+      },
+
+      handleScroll: true,
+      handleScale: true,
+
       width: chartContainerRef.current.clientWidth,
 
-      height: 320,
+      height: 420,
     });
 
     const series = chart.addCandlestickSeries({
@@ -96,6 +112,32 @@ export default function TerminalPage() {
       wickUpColor: "#22c55e",
       wickDownColor: "#ef4444",
     });
+
+    // LOAD INITIAL HISTORICAL DATA
+    const loadHistory = async () => {
+      try {
+        const res = await fetch(
+          "https://api.binance.com/api/v3/klines?symbol=SOLUSDT&interval=1m&limit=80",
+        );
+
+        const data = await res.json();
+
+        const candles = data.map((item: any) => ({
+          time: item[0] / 1000,
+          open: parseFloat(item[1]),
+          high: parseFloat(item[2]),
+          low: parseFloat(item[3]),
+          close: parseFloat(item[4]),
+        }));
+
+        series.setData(candles);
+        chart.timeScale().fitContent();
+      } catch (err) {
+        console.error("failed history load");
+      }
+    };
+
+    loadHistory();
 
     const ws = connectBinanceWS((candle) => {
       series.update(candle);
@@ -188,7 +230,7 @@ export default function TerminalPage() {
       <div className="border-b border-[#1A1A1A] px-6 py-4 flex justify-between items-center relative z-10">
         <Link
           href="/"
-          className="text-xs text-[#7A7A7A] hover:text-white transition"
+          className="text-sm text-[#8A8A8A] hover:text-white transition"
         >
           ← BACK
         </Link>
@@ -273,17 +315,17 @@ export default function TerminalPage() {
                   ${marketPrice.toFixed(2)}
                 </div>
 
-                <div className="text-[11px] text-[#666] mt-1">+5.12% TODAY</div>
+                <div className="text-xs text-[#666] mt-1">+5.12% TODAY</div>
               </div>
             </div>
 
             {/* CHART WRAPPER */}
-            <div className="relative h-[360px] mt-4">
+            <div className="relative h-[420px] mt-4">
               {/* CHART */}
               <div ref={chartContainerRef} className="absolute inset-0 z-10" />
 
               {/* VOLUME OVERLAY */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 px-3 flex items-end gap-[2px] opacity-20 pointer-events-none z-20">
+              <div className="absolute bottom-0 left-0 right-0 h-10 px-3 flex items-end gap-[2px] opacity-20 pointer-events-none z-20">
                 {[20, 35, 30, 55, 40, 70, 50, 90, 60, 95, 70, 100].map(
                   (v, i) => (
                     <div
@@ -302,7 +344,7 @@ export default function TerminalPage() {
             </div>
 
             {/* FOOTER STATS */}
-            <div className="relative z-20 border-t border-[#1A1A1A] px-5 py-4 flex items-center justify-between text-[11px] text-[#666]">
+            <div className="relative z-20 border-t border-[#1A1A1A] px-5 py-4 flex items-center justify-between text-xs text-[#666]">
               <div className="flex items-center gap-6">
                 <div>
                   VOL <span className="text-white ml-1">24.2M</span>
@@ -319,6 +361,75 @@ export default function TerminalPage() {
 
               <div className="text-orange-400 tracking-widest">
                 BINANCE WS CONNECTED
+              </div>
+            </div>
+          </div>
+          {/* EXECUTION ZONE */}
+          <div className="border-t border-[#1A1A1A] grid md:grid-cols-3">
+            {/* BUY */}
+            <div className="p-5 border-r border-[#1A1A1A] bg-green-500/5">
+              <div className="text-[10px] tracking-widest text-[#666]">
+                AI LONG EXECUTION
+              </div>
+
+              <div className="text-3xl font-bold text-green-400 mt-3">
+                BUY SOL
+              </div>
+
+              <div className="mt-2 text-xs text-[#AAA]">
+                Confidence: {signal.confidence}%
+              </div>
+
+              <button className="mt-5 w-full py-3 rounded-xl bg-green-500 text-black font-bold hover:opacity-90 transition">
+                EXECUTE LONG
+              </button>
+            </div>
+
+            {/* SELL */}
+            <div className="p-5 border-r border-[#1A1A1A] bg-red-500/5">
+              <div className="text-[10px] tracking-widest text-[#666]">
+                AI SHORT EXECUTION
+              </div>
+
+              <div className="text-3xl font-bold text-red-400 mt-3">
+                SELL SOL
+              </div>
+
+              <div className="mt-2 text-xs text-[#AAA]">
+                Defensive route active
+              </div>
+
+              <button className="mt-5 w-full py-3 rounded-xl bg-red-500 text-black font-bold hover:opacity-90 transition">
+                EXECUTE SHORT
+              </button>
+            </div>
+
+            {/* ROUTING */}
+            <div className="p-5 bg-[#101010]">
+              <div className="text-[10px] tracking-widest text-[#666]">
+                EXECUTION ROUTER
+              </div>
+
+              <div className="space-y-3 mt-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Venue</span>
+                  <span className="text-white">SoDEX</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Leverage</span>
+                  <span className="text-orange-400">3x</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Latency</span>
+                  <span className="text-cyan-400">12ms</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Status</span>
+                  <span className="text-green-400">READY</span>
+                </div>
               </div>
             </div>
           </div>
@@ -389,7 +500,7 @@ export default function TerminalPage() {
               MARKET CONTEXT ENGINE
             </div>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-[#666]">Sentiment Index</span>
 
@@ -422,7 +533,7 @@ export default function TerminalPage() {
               MARKET REASONING
             </div>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-3 text-sm">
               <div className="flex items-start gap-3 text-[#AAA]">
                 <div className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5" />
 
@@ -581,7 +692,7 @@ export default function TerminalPage() {
         </div>
 
         {/* LOG STREAM */}
-        <div className="p-5 space-y-3 text-xs font-mono">
+        <div className="p-5 space-y-3 text-sm font-mono">
           {logs.length === 0 ? (
             <div className="border border-[#1A1A1A] bg-[#101010] rounded-xl px-4 py-6 text-center text-[#666]">
               Waiting for live agent activity...
