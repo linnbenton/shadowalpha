@@ -199,10 +199,6 @@ export default function Home() {
 
       {/* HERO (Product Hunt STYLE) */}
       <section className="max-w-7xl mx-auto px-6 py-28 text-center">
-        <div className="inline-flex items-center rounded-full border border-[#1A1A1A] bg-[#0D0D0D] px-4 py-1.5 text-sm text-[#7A7A7A]">
-          Now Live on Early Access
-        </div>
-
         <h1 className="mt-8 text-6xl md:text-7xl font-bold leading-tight">
           Autonomous Execution Infrastructure for Onchain Markets
         </h1>

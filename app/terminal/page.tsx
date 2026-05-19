@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { createChart, ColorType } from "lightweight-charts";
 
@@ -11,7 +12,14 @@ import { connectBinanceWS } from "@/lib/binance";
 export default function TerminalPage() {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const [marketPrice, setMarketPrice] = useState(182.42);
-  const [intel, setIntel] = useState<any>(null);
+
+  const [intel, setIntel] = useState({
+    sentiment: 72,
+    funding: 0.012,
+    volumeSpike: false,
+    narrative: "Waiting for market intelligence...",
+    summary: "AI monitoring market structure...",
+  });
 
   const [signal, setSignal] = useState({
     direction: "LONG",
@@ -30,6 +38,26 @@ export default function TerminalPage() {
   });
 
   const [logs, setLogs] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchIntel = async () => {
+      try {
+        const res = await fetch("/api/intel");
+
+        const data = await res.json();
+
+        setIntel(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchIntel();
+
+    const interval = setInterval(fetchIntel, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -82,13 +110,7 @@ export default function TerminalPage() {
         marketContext.funding > 0 &&
         marketContext.volumeSpike;
 
-      if (close > 182 && bullishContext) {
-        setSignal({
-          direction: "LONG",
-          confidence: 91,
-          status: "BULLISH",
-        });
-
+      if (intel.sentiment > 70 && intel.funding > 0 && intel.volumeSpike) {
         setReasoning(
           "AI detected bullish continuation supported by positive funding, strong sentiment, and rising market participation.",
         );
@@ -104,9 +126,7 @@ export default function TerminalPage() {
           status: "DEFENSIVE",
         });
 
-        setReasoning(
-          "Risk engine detected weakening momentum and unstable participation structure.",
-        );
+        setReasoning(intel.narrative);
 
         setLogs((prev) => [
           `[${new Date().toLocaleTimeString()}] Defensive mode activated`,
@@ -173,8 +193,18 @@ export default function TerminalPage() {
           ← BACK
         </Link>
 
-        <div className="text-sm text-[#FFA500] tracking-[0.2em]">
-          SHADOWALPHA / QUANT OPS TERMINAL
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="ShadowAlpha"
+            width={34}
+            height={34}
+            className="object-contain"
+          />
+
+          <div className="text-sm text-[#FFA500] tracking-[0.2em]">
+            SHADOWALPHA / QUANT OPS TERMINAL
+          </div>
         </div>
 
         <div className="text-xs text-green-400 animate-pulse">
@@ -353,6 +383,39 @@ export default function TerminalPage() {
             </div>
           </div>
 
+          {/* MARKET CONTEXT */}
+          <div className="relative z-10 mt-4 border border-[#1A1A1A] rounded-2xl bg-[#101010] p-4">
+            <div className="text-[10px] tracking-widest text-[#666] mb-4">
+              MARKET CONTEXT ENGINE
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[#666]">Sentiment Index</span>
+
+                <span className="text-green-400 font-bold">
+                  {intel.sentiment}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-[#666]">Funding Rate</span>
+
+                <span className="text-orange-400 font-bold">
+                  {intel.funding}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-[#666]">Volume Spike</span>
+
+                <span className="text-cyan-400 font-bold">
+                  {intel.volumeSpike ? "ACTIVE" : "NORMAL"}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* AI REASONING */}
           <div className="relative z-10 mt-4 border border-[#1A1A1A] rounded-2xl bg-[#101010] p-4">
             <div className="text-[10px] tracking-widest text-[#666] mb-4">
@@ -432,8 +495,7 @@ export default function TerminalPage() {
               </div>
 
               <div className="mt-4 text-sm text-[#D0D0D0] leading-relaxed">
-                {intel?.summary ||
-                  "Waiting for structured market intelligence feed..."}
+                {intel.summary}
               </div>
             </div>
           </div>
