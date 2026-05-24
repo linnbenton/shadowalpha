@@ -1,25 +1,33 @@
 export function evaluateRisk(signal: any) {
-  const absChange = Math.abs(signal.change);
-
-  let level = "LOW RISK";
-  let color = "green";
-  let score = 20;
-
-  if (absChange > 2) {
-    level = "MEDIUM RISK";
-    color = "yellow";
-    score = 52;
+  if (!signal) {
+    return {
+      level: "HIGH RISK",
+      color: "red",
+      score: 100,
+    };
   }
 
-  if (absChange > 5) {
-    level = "HIGH RISK";
-    color = "red";
-    score = 81;
+  const score = signal.score ?? 50;
+
+  if (score > 65) {
+    return {
+      level: "LOW RISK",
+      color: "green",
+      score: 25,
+    };
+  }
+
+  if (score < 45) {
+    return {
+      level: "HIGH RISK",
+      color: "red",
+      score: 85,
+    };
   }
 
   return {
-    level,
-    color,
-    score,
+    level: "MEDIUM RISK",
+    color: "yellow",
+    score: 55,
   };
 }

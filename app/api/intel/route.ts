@@ -1,84 +1,73 @@
 import { NextResponse } from "next/server";
+import { fetchSoSoValue } from "@/lib/data/sosovalue";
 
 export async function GET() {
   try {
-    // FEAR & GREED
-    const fearGreedRes = await fetch(
-      "https://api.alternative.me/fng/?limit=1",
-      {
-        cache: "no-store",
-      },
-    );
+    const sosovalue = await fetchSoSoValue();
 
-    const fearGreedData = await fearGreedRes.json();
-
-    // BINANCE FUNDING
     const fundingRes = await fetch(
       "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=SOLUSDT",
-      {
-        cache: "no-store",
-      },
+      { cache: "no-store" },
     );
 
     const fundingData = await fundingRes.json();
 
-    // BINANCE VOLUME
     const tickerRes = await fetch(
       "https://api.binance.com/api/v3/ticker/24hr?symbol=SOLUSDT",
-      {
-        cache: "no-store",
-      },
+      { cache: "no-store" },
     );
 
     const tickerData = await tickerRes.json();
 
-    const sentiment = Number(fearGreedData?.data?.[0]?.value || 50);
-
     const funding = Number(fundingData?.lastFundingRate || 0);
-
     const volume = Number(tickerData?.quoteVolume || 0);
 
     const volumeSpike = volume > 100000000;
 
-    // AI SUMMARY ENGINE
+    // 🧠 COMPOSITE INTELLIGENCE SCORE (NEW CORE)
+    const sentiment = sosovalue.sentiment ?? 50;
+
+    const macroScore =
+      sentiment * 0.4 +
+      (sosovalue.narrativeStrength ?? 50) * 0.2 +
+      (sosovalue.liquidityFlow ?? 50) * 0.2 +
+      (funding > 0 ? 70 : 30) * 0.2;
+
     let summary = "";
     let narrative = "";
 
-    if (sentiment > 70 && funding > 0) {
-      summary =
-        "Bullish momentum detected across derivatives and market sentiment.";
-
+    if (macroScore > 70) {
+      summary = "Risk-on macro regime detected.";
       narrative =
-        "AI agents detected strong continuation probability supported by positive funding and aggressive participation.";
-    } else if (sentiment < 40) {
-      summary =
-        "Risk-off environment detected with weakening trader confidence.";
-
+        "Liquidity expansion + positive sentiment alignment across macro layers.";
+    } else if (macroScore < 40) {
+      summary = "Risk-off macro regime detected.";
       narrative =
-        "Defensive positioning activated due to deteriorating market structure.";
+        "Liquidity contraction and defensive positioning environment.";
     } else {
-      summary = "Neutral market conditions with mixed directional signals.";
-
-      narrative =
-        "Execution engine waiting for stronger confirmation before routing.";
+      summary = "Neutral macro regime.";
+      narrative = "Mixed signals across macro intelligence layers.";
     }
 
     return NextResponse.json({
       sentiment,
       funding,
       volumeSpike,
+
+      sosovalue,
+      macroScore,
+
       summary,
       narrative,
     });
   } catch (err) {
-    console.error(err);
-
     return NextResponse.json({
       sentiment: 50,
       funding: 0,
       volumeSpike: false,
-      summary: "Intelligence engine temporarily unavailable.",
-      narrative: "Fallback protection layer activated.",
+      macroScore: 50,
+      summary: "Intel fallback mode",
+      narrative: "System degraded",
     });
   }
 }

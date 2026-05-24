@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Execution {
+  id          String   @id @default(cuid())
+  txHash      String
+  asset       String
+  side        String
+  signal      String
+  confidence  Float
+  reason      String
+  status      String
+  createdAt   DateTime @default(now())
+}
+
+model WalletStats {
+  id            String   @id @default(cuid())
+  wallet        String
+  totalTrades   Int      @default(0)
+  winRate       Float    @default(0)
+  pnl           Float    @default(0)
+  lastUpdated   DateTime @updatedAt
+}

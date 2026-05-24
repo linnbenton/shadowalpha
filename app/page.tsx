@@ -26,6 +26,17 @@ type Signal = {
   score: number;
 };
 
+type Explanation = {
+  decision: string;
+  reasons: string[];
+  riskNotes: string[];
+  confidenceBreakdown: {
+    technical: number;
+    sentiment: number;
+    onchain: number;
+  };
+};
+
 type Risk = {
   level: string;
   color: string;
@@ -40,10 +51,13 @@ type Execution = {
 };
 
 export default function Home() {
+  const [intel, setIntel] = useState<any>(null);
+  const [intelLoading, setIntelLoading] = useState(false);
   const [coins, setCoins] = useState<Coin[]>([]);
   const [ticks, setTicks] = useState<number[]>([]);
-  const safeCoins = coins?.length ? coins : [];
+  const btcPrice = coins?.find((c) => c.symbol === "btc");
   const [signal, setSignal] = useState<Signal | null>(null);
+  const [explain, setExplain] = useState<Explanation | null>(null);
   const [risk, setRisk] = useState<Risk | null>(null);
   const [execution, setExecution] = useState<Execution | null>(null);
   const [executing, setExecuting] = useState(false);
@@ -54,6 +68,26 @@ export default function Home() {
   const [lastTradeTime, setLastTradeTime] = useState(0);
   const { connected, publicKey, connect, disconnect, select, sendTransaction } =
     useWallet();
+
+  const safeCoins = Array.isArray(coins) ? coins : [];
+
+  const displayCoins = safeCoins.filter((c) =>
+    ["btc", "eth", "sol"].includes(c.symbol),
+  );
+
+  const canExecuteTrade = () => {
+    if (!signal || !risk) return false;
+
+    if (signal.signal === "NEUTRAL") return false;
+
+    if (signal.confidence < 70) return false;
+
+    if (risk.score > 70) return false;
+
+    if (!coins.length) return false;
+
+    return true;
+  };
 
   async function fetchMarket() {
     try {
@@ -66,9 +100,17 @@ export default function Home() {
       console.log(json);
 
       if (json?.success && Array.isArray(json.data)) {
-        setCoins(json.data.slice(0, 3));
-        setSignal(json.signal);
+        setCoins(json.data ?? []);
+        if (json?.signal && Object.keys(json.signal).length > 0) {
+          setSignal(json.signal);
+        } else {
+          setSignal(null);
+        }
         setRisk(json.risk);
+
+        // 🔥 ADD THIS
+        const explanation = buildExplanation(json.signal, json.risk);
+        setExplain(explanation);
       }
     } catch (err) {
       console.log("market fetch retry...");
@@ -77,13 +119,74 @@ export default function Home() {
     }
   }
 
+  function buildExplanation(
+    signal: Signal | null,
+    risk: Risk | null,
+  ): Explanation | null {
+    if (!signal || !risk) return null;
+
+    const reasons: string[] = [];
+
+    if (signal.confidence > 80) {
+      reasons.push("High multi-agent consensus detected");
+    }
+
+    if (signal.trend.includes("bull")) {
+      reasons.push("Uptrend structure confirmed on short timeframe");
+    }
+
+    if (risk.score < 40) {
+      reasons.push("Low volatility exposure environment");
+    } else {
+      reasons.push("Elevated volatility detected in market structure");
+    }
+
+    return {
+      decision: signal.signal,
+      reasons,
+      riskNotes: [
+        `Risk score: ${risk.score}/100`,
+        `Market regime: ${risk.level}`,
+      ],
+      confidenceBreakdown: {
+        technical: signal.confidence * 0.4,
+        sentiment: signal.confidence * 0.35,
+        onchain: signal.confidence * 0.25,
+      },
+    };
+  }
+
+  const fetchIntel = async () => {
+    if (intelLoading) return;
+
+    setIntelLoading(true);
+
+    try {
+      const res = await fetch("/api/intel", {
+        cache: "no-store",
+      });
+
+      const data = await res.json();
+
+      setIntel(data);
+    } catch (err) {
+      console.error("INTEL FETCH ERROR:", err);
+    } finally {
+      setIntelLoading(false);
+    }
+  };
+
   const executeTrade = async () => {
+    // ⛔ Cek status eksekusi di paling atas sebelum mengubah state
+    if (!connected || !publicKey || executing) {
+      console.log("blocked execution:", { connected, publicKey, executing });
+      return;
+    }
+
     try {
       setExecuting(true);
 
       if (!publicKey) throw new Error("Wallet not connected");
-      if (!connected || executing) return;
-      if (!connected || !publicKey) return;
 
       const connection = new Connection(
         "https://api.devnet.solana.com",
@@ -112,6 +215,41 @@ export default function Home() {
       setTxHash(signature);
     } catch (err) {
       console.log("TX ERROR:", err);
+    } finally {
+      setExecuting(false);
+    }
+  };
+
+  const handleTrade = async (side: "BUY" | "SELL") => {
+    if (!canExecuteTrade()) {
+      console.log("BLOCKED: weak signal or high risk");
+      return;
+    }
+
+    try {
+      setExecuting(true);
+
+      const res = await fetch("/api/trade", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          side,
+          symbol: "SOL",
+          signal,
+          risk,
+          market: coins,
+        }),
+      });
+
+      const json = await res.json();
+
+      setExecution(json);
+
+      console.log("EXECUTION RESULT:", json);
+    } catch (err) {
+      console.error("TRADE ERROR:", err);
     } finally {
       setExecuting(false);
     }
@@ -186,7 +324,8 @@ export default function Home() {
     interval = setInterval(runLoop, 8000); // check tiap 8 detik
 
     return () => clearInterval(interval);
-  }, [autoMode, isLoopRunning, lastTradeTime]);
+    // Masukkan dependency yang dibutuhkan, hilangkan 'isLoopRunning' agar tidak me-restart interval tiap kali loop berjalan
+  }, [autoMode, lastTradeTime, executeTrade]);
 
   return (
     <main className="min-h-screen text-white bg-black relative overflow-hidden">
@@ -351,7 +490,6 @@ export default function Home() {
               </div>
 
               {/* LIVE QUANT PRICE GRID */}
-
               <div className="mt-6 border border-[#1A1A1A] rounded-xl p-4 overflow-hidden">
                 {/* HEADER */}
                 <div className="flex items-center justify-between">
@@ -359,30 +497,27 @@ export default function Home() {
                     <div className="text-xs text-[#555]">
                       QUANT PRICE ACTION GRID
                     </div>
-                    ```
+
                     <div className="text-[10px] text-[#333] mt-1">
                       live simulated execution flow
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-cyan-400">
-                      BTC ${safeCoins[0]?.current_price?.toLocaleString()}
+                      BTC ${btcPrice?.current_price?.toLocaleString()}
                     </div>
 
                     <div
                       className={`text-[10px] mt-1 ${
-                        (safeCoins[0]?.price_change_percentage_24h ?? 0) >= 0
+                        (btcPrice?.price_change_percentage_24h ?? 0) >= 0
                           ? "text-green-400"
                           : "text-red-400"
                       }`}
                     >
-                      {(safeCoins[0]?.price_change_percentage_24h ?? 0).toFixed(
-                        2,
-                      )}
+                      {(btcPrice?.price_change_percentage_24h ?? 0).toFixed(2)}%
                       %
                     </div>
                   </div>
-                  ```
                 </div>
 
                 {/* LIVE BARS */}
@@ -413,12 +548,11 @@ export default function Home() {
 
                 <div className="mt-4 flex items-center justify-between text-[10px] text-[#444]">
                   <div>LIVE EXECUTION FLOW</div>
-                  ```
+
                   <div>
                     {signal?.signal || "NEUTRAL"} • CONFIDENCE{" "}
                     {signal?.confidence || 0}%
                   </div>
-                  ```
                 </div>
               </div>
             </div>
@@ -618,7 +752,7 @@ export default function Home() {
               <div className="text-sm text-[#7A7A7A]">MARKET OVERVIEW</div>
 
               {/* EMPTY STATE (WAJIB) */}
-              {safeCoins.length === 0 && (
+              {displayCoins.length === 0 && (
                 <div className="mt-4 text-[#555] text-xs">
                   Waiting for market data...
                 </div>
@@ -626,9 +760,11 @@ export default function Home() {
 
               {/* GRID DATA */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                {safeCoins.map((coin) => {
-                  const isPositive =
-                    (coin.price_change_percentage_24h ?? 0) >= 0;
+                {displayCoins.map((coin) => {
+                  if (!coin) return null; // 🔥 safety layer
+
+                  const change = coin.price_change_percentage_24h ?? 0;
+                  const isPositive = change >= 0;
 
                   return (
                     <div
@@ -652,8 +788,7 @@ export default function Home() {
                           isPositive ? "text-green-400" : "text-red-400"
                         }`}
                       >
-                        {isPositive ? "▲" : "▼"}{" "}
-                        {(coin.price_change_percentage_24h ?? 0).toFixed(2)}
+                        {isPositive ? "▲" : "▼"} {change.toFixed(2)}%
                       </div>
                     </div>
                   );
@@ -675,20 +810,17 @@ export default function Home() {
 
                   <div className="text-right">
                     <div className="text-xs text-cyan-400">
-                      BTC ${safeCoins[0]?.current_price?.toLocaleString()}
+                      BTC ${btcPrice?.current_price?.toLocaleString()}
                     </div>
 
                     <div
                       className={`text-[10px] mt-1 ${
-                        (safeCoins[0]?.price_change_percentage_24h ?? 0) >= 0
+                        (btcPrice?.price_change_percentage_24h ?? 0) >= 0
                           ? "text-green-400"
                           : "text-red-400"
                       }`}
                     >
-                      {(safeCoins[0]?.price_change_percentage_24h ?? 0).toFixed(
-                        2,
-                      )}
-                      %
+                      {(btcPrice?.price_change_percentage_24h ?? 0).toFixed(2)}%
                     </div>
                   </div>
                 </div>
@@ -732,6 +864,54 @@ export default function Home() {
                     <div className="text-[#7A7A7A] mt-2">{signal.trend}</div>
                     <div className="text-cyan-400 mt-2">
                       confidence: {signal.confidence}%
+                    </div>
+                  </div>
+                )}
+
+                {explain && (
+                  <div className="p-4 border border-cyan-500/20 rounded-2xl mt-4">
+                    <div className="text-cyan-400 text-xs font-semibold">
+                      AI DECISION EXPLANATION
+                    </div>
+
+                    <div className="mt-3 text-xs space-y-2 text-[#7A7A7A]">
+                      <div className="text-white font-medium">
+                        Decision: {explain.decision}
+                      </div>
+
+                      <div>
+                        <div className="text-[#555] mb-1">Reasons:</div>
+                        <ul className="space-y-1">
+                          {explain.reasons.map((r, i) => (
+                            <li key={i}>• {r}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <div className="text-[#555] mb-1 mt-2">Risk Notes:</div>
+                        <ul className="space-y-1">
+                          {explain.riskNotes.map((r, i) => (
+                            <li key={i}>• {r}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="mt-2 text-cyan-400">
+                        Breakdown:
+                        <div className="text-[10px] mt-1">
+                          Tech:{" "}
+                          {explain.confidenceBreakdown.technical.toFixed(1)}%
+                        </div>
+                        <div className="text-[10px]">
+                          Sentiment:{" "}
+                          {explain.confidenceBreakdown.sentiment.toFixed(1)}%
+                        </div>
+                        <div className="text-[10px]">
+                          Onchain:{" "}
+                          {explain.confidenceBreakdown.onchain.toFixed(1)}%
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
