@@ -21,7 +21,7 @@ model Execution {
 
 model WalletStats {
   id            String   @id @default(cuid())
-  wallet        String
+  wallet        String   @unique
   totalTrades   Int      @default(0)
   winRate       Float    @default(0)
   pnl           Float    @default(0)
