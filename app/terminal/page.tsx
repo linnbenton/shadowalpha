@@ -8,6 +8,13 @@ import { createChart, ColorType } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
 
 import { connectBinanceWS } from "@/lib/binance";
+import { getRandomSignal } from "@/lib/signalEngine";
+
+import AISignalPanel from "@/components/AISignalPanel";
+import WorkflowPipeline from "@/components/WorkflowPipeline";
+import ExecutionSimulation from "@/components/ExecutionSimulation";
+import LiveTerminalLogs from "@/components/LiveTerminalLogs";
+import ExecutionLifecycle from "@/components/ExecutionLifecycle";
 
 export default function TerminalPage() {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
@@ -21,7 +28,11 @@ export default function TerminalPage() {
     summary: "AI monitoring market structure...",
   });
 
-  const [signal, setSignal] = useState({
+  const [signal, setSignal] = useState<{
+    direction: string;
+    confidence: number;
+    status: string;
+  }>({
     direction: "LONG",
     confidence: 87,
     status: "BULLISH",
@@ -30,12 +41,6 @@ export default function TerminalPage() {
   const [reasoning, setReasoning] = useState(
     "Monitoring volatility structure...",
   );
-
-  const [marketContext, setMarketContext] = useState({
-    sentiment: 74,
-    funding: 0.012,
-    volumeSpike: true,
-  });
 
   const [logs, setLogs] = useState<string[]>([]);
 
@@ -146,32 +151,63 @@ export default function TerminalPage() {
 
       setMarketPrice(close);
 
-      // SIMPLE SIGNAL ENGINE
-      const bullishContext =
-        marketContext.sentiment > 70 &&
-        marketContext.funding > 0 &&
-        marketContext.volumeSpike;
+      const action =
+        intel.sentiment > 70
+          ? "AGGRESSIVE LONG ROUTING"
+          : intel.sentiment < 40
+            ? "DEFENSIVE HEDGE ACTIVATED"
+            : "NEUTRAL MARKET MONITORING";
 
+      // BULLISH
       if (intel.sentiment > 70 && intel.funding > 0 && intel.volumeSpike) {
+        setSignal({
+          direction: "LONG",
+          confidence: 91,
+          status: "AGGRESSIVE",
+        });
+
         setReasoning(
           "AI detected bullish continuation supported by positive funding, strong sentiment, and rising market participation.",
         );
 
         setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] LONG signal triggered on SOL/USD`,
+          `[${new Date().toLocaleTimeString()}] ${action}`,
           ...prev.slice(0, 7),
         ]);
-      } else {
+      }
+
+      // BEARISH
+      else if (intel.sentiment < 40) {
         setSignal({
           direction: "SHORT",
-          confidence: 68,
+          confidence: 74,
           status: "DEFENSIVE",
         });
 
-        setReasoning(intel.narrative);
+        setReasoning(
+          "Defensive positioning activated due to deteriorating market structure.",
+        );
 
         setLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] Defensive mode activated`,
+          `[${new Date().toLocaleTimeString()}] ${action}`,
+          ...prev.slice(0, 7),
+        ]);
+      }
+
+      // NEUTRAL
+      else {
+        setSignal({
+          direction: "NEUTRAL",
+          confidence: 52,
+          status: "MONITORING",
+        });
+
+        setReasoning(
+          "Execution engine waiting for stronger confirmation before routing.",
+        );
+
+        setLogs((prev) => [
+          `[${new Date().toLocaleTimeString()}] ${action}`,
           ...prev.slice(0, 7),
         ]);
       }
@@ -183,8 +219,10 @@ export default function TerminalPage() {
       });
     };
 
+    window.addEventListener("resize", handleResize);
+
     return () => {
-      window.addEventListener("resize", handleResize);
+      window.removeEventListener("resize", handleResize);
       ws.close();
       chart.remove();
     };
@@ -206,6 +244,27 @@ export default function TerminalPage() {
     fetchIntel();
 
     const interval = setInterval(fetchIntel, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const next = getRandomSignal();
+
+      setSignal({
+        direction: next.direction,
+        confidence: next.confidence,
+        status: next.status,
+      });
+
+      setReasoning(next.narrative);
+
+      setLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] AI switched market bias to ${next.direction}`,
+        ...prev.slice(0, 9),
+      ]);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
@@ -428,7 +487,21 @@ export default function TerminalPage() {
 
                 <div className="flex justify-between">
                   <span className="text-[#666]">Status</span>
-                  <span className="text-green-400">READY</span>
+                  <span
+                    className={`${
+                      intel.sentiment > 70
+                        ? "text-green-400"
+                        : intel.sentiment < 40
+                          ? "text-red-400"
+                          : "text-yellow-400"
+                    }`}
+                  >
+                    {intel.sentiment > 70
+                      ? "AGGRESSIVE"
+                      : intel.sentiment < 40
+                        ? "DEFENSIVE"
+                        : "MONITORING"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -436,7 +509,7 @@ export default function TerminalPage() {
         </div>
 
         {/* AI ENGINE */}
-        <div className="md:col-span-4 border border-[#1A1A1A] rounded-2xl bg-[#0D0D0D]/80 backdrop-blur-xl p-5 shadow-[0_0_40px_rgba(255,120,0,0.05)] relative overflow-hidden">
+        <div className="md:col-span-4 h-[920px] border border-[#1A1A1A] rounded-2xl bg-[#0D0D0D]/80 backdrop-blur-xl p-5 shadow-[0_0_40px_rgba(255,120,0,0.05)] relative overflow-hidden flex flex-col">
           {/* BG GLOW */}
           <div className="absolute inset-0 bg-orange-500/5 blur-3xl pointer-events-none" />
 
@@ -528,36 +601,35 @@ export default function TerminalPage() {
           </div>
 
           {/* AI REASONING */}
-          <div className="relative z-10 mt-4 border border-[#1A1A1A] rounded-2xl bg-[#101010] p-4">
+          <div className="relative z-10 mt-4 border border-[#1A1A1A] rounded-2xl bg-[#101010] p-4 h-[190px] overflow-hidden">
             <div className="text-[10px] tracking-widest text-[#666] mb-4">
               MARKET REASONING
             </div>
 
-            <div className="space-y-3 text-sm">
+            <div className="space-y-3 text-sm h-full overflow-hidden">
               <div className="flex items-start gap-3 text-[#AAA]">
                 <div className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5" />
 
-                <div>{reasoning}</div>
+                <div className="line-clamp-3 leading-relaxed">{reasoning}</div>
               </div>
 
               <div className="flex items-start gap-3 text-[#777]">
                 <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5" />
 
-                <div>Sentiment Index: {marketContext.sentiment}/100</div>
+                <div>Sentiment Index: {intel.sentiment}/100</div>
               </div>
 
               <div className="flex items-start gap-3 text-[#777]">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5" />
 
-                <div>Funding Rate: {marketContext.funding}%</div>
+                <div>Funding Rate: {intel.funding}%</div>
               </div>
 
               <div className="flex items-start gap-3 text-[#777]">
                 <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-1.5" />
 
                 <div>
-                  Volume Spike:{" "}
-                  {marketContext.volumeSpike ? "Detected" : "Normal"}
+                  Volume Spike: {intel.volumeSpike ? "Detected" : "Normal"}
                 </div>
               </div>
             </div>
@@ -668,62 +740,78 @@ export default function TerminalPage() {
         </div>
       </div>
 
-      {/* LIVE AGENT FEED */}
-      <div className="md:col-span-12 border border-[#1A1A1A] rounded-2xl bg-[#0D0D0D]/80 backdrop-blur-xl overflow-hidden shadow-[0_0_40px_rgba(255,120,0,0.05)]">
-        {/* HEADER */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1A1A1A]">
-          <div>
-            <div className="text-xs tracking-[0.2em] text-[#7A7A7A] uppercase">
-              Autonomous Agent Activity
-            </div>
+      {/* AI MODULE GRID */}
+      <div className="px-6 pb-6 relative z-10">
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <AISignalPanel />
 
-            <div className="text-lg font-bold mt-2">
-              SHADOW EXECUTION STREAM
-            </div>
-          </div>
+          <WorkflowPipeline />
 
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <ExecutionSimulation />
 
-            <div className="text-[10px] tracking-widest text-green-400">
-              LIVE FEED
-            </div>
-          </div>
+          <LiveTerminalLogs />
         </div>
+      </div>
 
-        {/* LOG STREAM */}
-        <div className="p-5 space-y-3 text-sm font-mono">
-          {logs.length === 0 ? (
-            <div className="border border-[#1A1A1A] bg-[#101010] rounded-xl px-4 py-6 text-center text-[#666]">
-              Waiting for live agent activity...
-            </div>
-          ) : (
-            logs.map((log, i) => (
-              <div
-                key={i}
-                className="group border border-[#1A1A1A] bg-[#101010] rounded-xl px-4 py-3 flex items-start justify-between hover:border-orange-500/20 transition-all duration-300"
-              >
-                <div className="flex items-start gap-4">
-                  {/* STATUS DOT */}
-                  <div className="relative mt-1">
-                    <div className="w-2 h-2 rounded-full bg-orange-400" />
-
-                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-orange-400 animate-ping opacity-40" />
-                  </div>
-
-                  {/* LOG CONTENT */}
-                  <div className="text-[#CCC] group-hover:text-white transition leading-relaxed">
-                    {log}
-                  </div>
+      {/* LIVE SYSTEM GRID */}
+      <div className="px-6 pb-6 relative z-10">
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LIVE AGENT FEED */}
+          <div className="lg:col-span-2 h-[620px] border border-[#1A1A1A] rounded-2xl bg-[#0D0D0D]/80 backdrop-blur-xl overflow-hidden shadow-[0_0_40px_rgba(255,120,0,0.05)]">
+            {/* HEADER */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#1A1A1A]">
+              <div>
+                <div className="text-xs tracking-[0.2em] text-[#7A7A7A] uppercase">
+                  Autonomous Agent Activity
                 </div>
 
-                {/* STATUS */}
-                <div className="text-[10px] text-green-400 tracking-widest">
-                  LIVE
+                <div className="text-lg font-bold mt-2">
+                  SHADOW EXECUTION STREAM
                 </div>
               </div>
-            ))
-          )}
+
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+
+                <div className="text-[10px] tracking-widest text-green-400">
+                  LIVE FEED
+                </div>
+              </div>
+            </div>
+
+            {/* LOG STREAM */}
+            <div className="h-[520px] p-5 overflow-hidden">
+              <div className="space-y-3 text-sm font-mono">
+                {logs.length === 0 ? (
+                  <div className="border border-[#1A1A1A] bg-[#101010] rounded-xl px-4 py-6 text-center text-[#666]">
+                    Waiting for live agent activity...
+                  </div>
+                ) : (
+                  logs.slice(-6).map((log, i) => (
+                    <div
+                      key={i}
+                      className="group border border-[#1A1A1A] bg-[#101010] rounded-xl px-4 py-3 flex items-start justify-between hover:border-orange-500/20 transition-colors duration-300"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-2 h-2 rounded-full bg-orange-400 mt-1.5 shrink-0" />
+
+                        <div className="text-[#CCC] group-hover:text-white transition leading-relaxed">
+                          {log}
+                        </div>
+                      </div>
+
+                      <div className="text-[10px] text-green-400 tracking-widest shrink-0">
+                        LIVE
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* EXECUTION LIFECYCLE */}
+          <ExecutionLifecycle />
         </div>
       </div>
 
