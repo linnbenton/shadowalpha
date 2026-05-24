@@ -232,20 +232,29 @@ The system is not intended for production trading or autonomous capital deployme
 
 # Roadmap
 
-## Wave 2
+## Wave 2 — Explainable AI & Autonomous Intelligence
 
-Focus: autonomous market intelligence and execution expansion.
+Focus: autonomous market reasoning, execution visibility, and live intelligence orchestration.
 
-### Planned
+### Implemented
 
-- SoSoValue API integration
+- real-time intelligence pipeline
 - autonomous execution loop
-- persistent AI monitoring agents
-- advanced signal scoring
-- improved strategy engine
-- wallet analytics
-- execution history
+- persistent AI monitoring feed
+- explainable reasoning engine
+- advanced signal confidence scoring
+- live execution lifecycle visualization
+- adaptive market routing states
+- Binance websocket market stream
+- dynamic SoSoValue-style sentiment analysis
+
+### In Progress
+
+- execution history persistence
+- wallet analytics engine
 - automated trigger conditions
+- multi-agent orchestration
+- on-chain execution proofs
 
 ---
 

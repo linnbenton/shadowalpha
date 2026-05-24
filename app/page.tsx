@@ -538,6 +538,9 @@ export default function Home() {
                     }
 
                     select(PhantomWalletName);
+
+                    // TAMBAHAN PENTING
+                    await connect();
                   } catch (err) {
                     console.log(err);
                   }
