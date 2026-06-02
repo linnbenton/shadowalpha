@@ -10,8 +10,8 @@ export async function executionAgent(
 
     const tx = new Transaction();
 
-    // placeholder instruction
-    // nanti kamu replace real swap / trade logic
+    // Placeholder execution instruction.
+    // Replace with production swap or trade logic.
 
     const signature = await sendTransaction(
       tx,

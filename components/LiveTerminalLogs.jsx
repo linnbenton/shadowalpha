@@ -1,29 +1,28 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
-const logs = [
-  "[CONNECTED] SoSoValue API online",
-  "Pulling live market narratives...",
-  "Analyzing ETF momentum...",
-  "Detecting smart money movement...",
-  "Generating AI confidence score...",
-  "Running execution simulation...",
-];
-
 export default function LiveTerminalLogs() {
-  const [visibleLogs, setVisibleLogs] = useState([]);
+  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    let index = 0;
+    const load = async () => {
+      const res = await fetch("/api/intel");
 
-    const interval = setInterval(() => {
-      setVisibleLogs((prev) => [...prev, logs[index]]);
+      const intel = await res.json();
 
-      index++;
+      setLogs([
+        `[INTEL] ${intel.summary}`,
+        `[NARRATIVE] ${intel.narrative}`,
+        `[MACRO SCORE] ${intel.macroScore}`,
+        `[SENTIMENT] ${intel.sentiment}`,
+        `[FUNDING] ${intel.funding}`,
+      ]);
+    };
 
-      if (index >= logs.length) {
-        clearInterval(interval);
-      }
-    }, 700);
+    load();
+
+    const interval = setInterval(load, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -33,8 +32,8 @@ export default function LiveTerminalLogs() {
       <div className="text-cyan-400 font-bold mb-4">AI TERMINAL</div>
 
       <div className="space-y-2 text-sm font-mono">
-        {visibleLogs.map((log, i) => (
-          <div key={i} className="text-green-400 animate-pulse">
+        {logs.map((log, i) => (
+          <div key={i} className="text-green-400">
             {">"} {log}
           </div>
         ))}

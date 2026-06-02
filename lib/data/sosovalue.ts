@@ -5,11 +5,15 @@ export interface SoSoValueData {
   marketRegime?: "risk-on" | "risk-off" | "neutral";
 }
 
-// MOCK FIRST (karena API real SoSoValue biasanya private / evolving)
+// Temporary fallback implementation.
+// Replace with the official SoSoValue API when production access is available.
 export async function fetchSoSoValue(): Promise<SoSoValueData> {
   try {
-    // nanti bisa diganti real API endpoint
-    const res = await fetch("https://api.alternative.me/fng/", {
+    // Development data source used until official integration is enabled.
+    const res = await fetch(process.env.SOSOVALUE_API_URL!, {
+      headers: {
+        Authorization: `Bearer ${process.env.SOSOVALUE_API_KEY}`,
+      },
       cache: "no-store",
     });
 
@@ -22,7 +26,7 @@ export async function fetchSoSoValue(): Promise<SoSoValueData> {
       liquidityFlow: Math.random() * 100,
       marketRegime: fear > 70 ? "risk-on" : fear < 40 ? "risk-off" : "neutral",
     };
-  } catch (err) {
+  } catch {
     return {
       sentiment: 50,
       narrativeStrength: 50,

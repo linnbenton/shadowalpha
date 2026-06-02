@@ -16,6 +16,9 @@ model Execution {
   confidence  Float
   reason      String
   status      String
+
+  proofHash   String?
+
   createdAt   DateTime @default(now())
 }
 
