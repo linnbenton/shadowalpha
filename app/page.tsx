@@ -7,6 +7,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 import { PhantomWalletName } from "@solana/wallet-adapter-wallets";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 import { Connection, SystemProgram, Transaction } from "@solana/web3.js";
 
@@ -663,63 +664,38 @@ export default function Home() {
                 View Demo
               </button>
 
+              <WalletMultiButton />
+
               <button
                 onClick={async () => {
                   try {
                     if (connected) {
                       await disconnect();
-                      return;
                     }
-
-                    select(PhantomWalletName);
-
-                    // TAMBAHAN PENTING
-                    await connect();
                   } catch (err) {
-                    console.log(err);
+                    console.log("Wallet disconnect error:", err);
                   }
                 }}
+                disabled={!connected}
                 className="
-                  relative
-                  overflow-hidden
+                  px-3 py-1.5
+                  text-xs
+                  rounded-lg
 
-                  rounded-2xl
-                  border border-orange-400/20
+                  border border-[#2A2A2A]
+                  bg-[#0D0D0D]
+                  text-[#AAAAAA]
 
-                  bg-[#FF6B00]
+                  transition-all duration-200
 
-                  px-6 py-3
-                  text-sm
-                  font-medium
-                  text-white
+                  hover:bg-[#151515]
+                  hover:text-white
 
-                  transition-all
-                  duration-300
-
-                  hover:scale-105
-                  hover:bg-[#ff7b1a]
-
-                  shadow-[0_0_30px_rgba(255,107,0,0.35)]
+                  disabled:opacity-40
+                  disabled:cursor-not-allowed
                 "
               >
-                <span className="relative z-10">
-                  {connected ? "Disconnect Wallet" : "Connect Wallet"}
-                </span>
-
-                <div
-                  className="
-                    absolute
-                    inset-0
-
-                    bg-gradient-to-r
-                    from-transparent
-                    via-white/20
-                    to-transparent
-
-                    -translate-x-full
-                    animate-[shine_2.5s_linear_infinite]
-                  "
-                />
+                Disconnect
               </button>
             </div>
           </div>
@@ -1015,13 +991,13 @@ export default function Home() {
                   onClick={executeTrade}
                   disabled={!connected || executing}
                   className="
-          rounded-2xl
-          bg-[#FF6B00]
-          px-5 py-3
-          text-sm
-          disabled:opacity-40
-          transition-all duration-300
-        "
+                    rounded-2xl
+                    bg-[#FF6B00]
+                    px-5 py-3
+                    text-sm
+                    disabled:opacity-40
+                    transition-all duration-300
+                  "
                 >
                   {executing
                     ? "Executing..."
