@@ -15,6 +15,13 @@ export default function Navbar() {
         {/* MENU */}
         <div className="flex items-center gap-8 text-sm">
           <Link
+            href="/how"
+            className="text-[#7A7A7A] hover:text-[#FF6B00] transition-colors"
+          >
+            How It Works
+          </Link>
+
+          <Link
             href="/features"
             className="text-[#7A7A7A] hover:text-[#FF6B00] transition-colors"
           >

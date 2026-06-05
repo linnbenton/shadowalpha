@@ -664,39 +664,27 @@ export default function Home() {
                 View Demo
               </button>
 
-              <WalletMultiButton />
-
-              <button
-                onClick={async () => {
-                  try {
-                    if (connected) {
-                      await disconnect();
-                    }
-                  } catch (err) {
-                    console.log("Wallet disconnect error:", err);
-                  }
-                }}
-                disabled={!connected}
+              <WalletMultiButton
                 className="
-                  px-3 py-1.5
-                  text-xs
-                  rounded-lg
+                  !bg-[#FF6B00]
+                  hover:!bg-[#ff7b1a]
 
-                  border border-[#2A2A2A]
-                  bg-[#0D0D0D]
-                  text-[#AAAAAA]
+                  !rounded-2xl
 
-                  transition-all duration-200
+                  !h-[52px]
+                  !px-6
 
-                  hover:bg-[#151515]
-                  hover:text-white
+                  !text-white
+                  !font-medium
 
-                  disabled:opacity-40
-                  disabled:cursor-not-allowed
+                  !shadow-[0_0_30px_rgba(255,107,0,0.35)]
+
+                  !border
+                  !border-orange-400/20
+
+                  !transition-all
                 "
-              >
-                Disconnect
-              </button>
+              />
             </div>
           </div>
         </div>

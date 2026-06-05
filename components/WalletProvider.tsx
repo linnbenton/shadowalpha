@@ -18,7 +18,7 @@ export default function AppWalletProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const endpoint = clusterApiUrl("devnet");
+  const endpoint = useMemo(() => clusterApiUrl("devnet"), []);
 
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
