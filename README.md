@@ -88,6 +88,36 @@ Output:
 
 ---
 
+## SoSoValue Intelligence Integration
+
+ShadowAlpha uses SoSoValue as a macro-intelligence and sentiment data source.
+
+The Intelligence Engine consumes:
+
+- Market Sentiment
+- ETF Flow Signals
+- Macro Market Insights
+- News Intelligence
+- Sector Narratives
+
+These signals are combined with live market data to generate explainable trading decisions.
+
+```text
+SoSoValue Intelligence
+          +
+Live Market Data
+          ↓
+Intelligence Engine
+          ↓
+AI Reasoning Layer
+          ↓
+Trading Signal
+```
+
+This allows ShadowAlpha to incorporate both real-time price action and higher-level market context before generating execution recommendations.
+
+---
+
 ## Explainable AI
 
 Every signal includes:
