@@ -20,13 +20,38 @@ Built on Solana, the platform combines:
 
 Instead of acting as a black-box trading system, ShadowAlpha exposes the reasoning, confidence score, risk analysis, and execution lifecycle behind every generated signal.
 
-**Wave Hacks Product Page**
-
-https://app.akindo.io/wave-hacks/JBEQXgN4Zi2jA3wA?tab=overview
+**[View the official Wave Hacks submission](https://app.akindo.io/wave-hacks/JBEQXgN4Zi2jA3wA?tab=overview)**
 
 ---
 
 # Wave 2 Status
+
+## Wave 2 Integration Highlights
+
+During Wave 2, ShadowAlpha completed integration with the SoSoValue API.
+
+Integrated capabilities include:
+
+- Currency Registry Access
+- Live Market Snapshot Data
+- Intelligence Data Pipeline
+- Market Signal Generation
+- Risk Evaluation Inputs
+
+Market intelligence is sourced directly from SoSoValue and used by:
+
+- Signal Engine
+- Risk Engine
+- Trading Terminal
+- Execution Layer
+
+### Verified API Endpoints
+
+- `/api/sosotest`
+- `/api/soso-btc`
+- `/api/market`
+
+These endpoints are powered by live SoSoValue API responses and feed the ShadowAlpha intelligence pipeline.
 
 ## ✅ Completed
 
@@ -49,21 +74,23 @@ Implemented components:
 # Architecture
 
 ```text
-Market Data
-     │
-     ▼
+SoSoValue Market Data
+          +
+SoSoValue Intelligence
+          │
+          ▼
 Intelligence Engine
-     │
-     ▼
+          │
+          ▼
 Decision Layer
-     │
-     ▼
+          │
+          ▼
 Risk Engine
-     │
-     ▼
+          │
+          ▼
 Execution Engine
-     │
-     ▼
+          │
+          ▼
 On-Chain Proof System
 ```
 
@@ -90,17 +117,34 @@ Output:
 
 ## SoSoValue Intelligence Integration
 
-ShadowAlpha uses SoSoValue as a macro-intelligence and sentiment data source.
+ShadowAlpha integrates directly with the SoSoValue API as its primary intelligence and market data provider.
 
-The Intelligence Engine consumes:
+The platform consumes:
 
+- Live Market Snapshots
 - Market Sentiment
 - ETF Flow Signals
 - Macro Market Insights
 - News Intelligence
 - Sector Narratives
 
-These signals are combined with live market data to generate explainable trading decisions.
+Data from SoSoValue is processed by the Intelligence Engine and used throughout the decision, risk, and execution pipeline.
+
+```text
+SoSoValue Market Data
+          +
+SoSoValue Intelligence
+          ↓
+Intelligence Engine
+          ↓
+AI Reasoning Layer
+          ↓
+Risk Engine
+          ↓
+Execution Layer
+```
+
+These signals are combined with real-time market conditions to generate explainable trading decisions.
 
 ```text
 SoSoValue Intelligence
@@ -191,8 +235,8 @@ The trading terminal provides:
 - TailwindCSS
 - Solana Web3.js
 - Solana Wallet Adapter
-- CoinGecko API
-- SoSoValue API
+- SoSoValue Market Snapshot API
+- SoSoValue Intelligence Data
 - Binance WebSocket
 - Lightweight Charts
 
@@ -217,6 +261,7 @@ The trading terminal provides:
 - Execution Proof Tracking
 - Wallet Analytics
 - Explainable Decision Layer
+- SoSoValue Integration
 
 ## Wave 3 — Autonomous Execution
 

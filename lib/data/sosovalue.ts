@@ -6,7 +6,6 @@ export interface SoSoValueData {
 }
 
 // Temporary fallback implementation.
-// Replace with the official SoSoValue API when production access is available.
 export async function fetchSoSoValue(): Promise<SoSoValueData> {
   try {
     // Development data source used until official integration is enabled.
